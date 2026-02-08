@@ -110,3 +110,51 @@ describe('Derived classes stats', () => {
         expect(() => new Bowerman('A')).toThrow();
     });
 });
+
+describe('Character methods: damage(points)', () => {
+    test('should reduce health by formula and return undefined', () => {
+        const hero = new Swordsman('Arthur'); // defence = 10
+
+        const result = hero.damage(10); // 100 - 10 * (1 - 0.1) = 91
+        expect(result).toBeUndefined();
+        expect(hero.health).toBe(91);
+    });
+
+    test('should clamp health to 0 if damage is too big', () => {
+        const hero = new Undead('Bones'); // defence = 25
+
+        hero.damage(200); // 100 - 200*(1-0.25)=100-150=-50 -> 0
+        expect(hero.health).toBe(0);
+    });
+
+    test('should do nothing if character already dead', () => {
+        const hero = new Undead('Bones');
+        hero.health = 0;
+
+        hero.damage(10);
+        expect(hero.health).toBe(0);
+    });
+});
+
+describe('Character methods: levelUp()', () => {
+    test('should increase level, boost stats and restore health to 100', () => {
+        const hero = new Bowerman('Robin'); // 25/25
+
+        hero.damage(50);
+        expect(hero.health).toBe(62.5);
+
+        hero.levelUp();
+
+        expect(hero.level).toBe(2);
+        expect(hero.attack).toBe(30);
+        expect(hero.defence).toBe(30);
+        expect(hero.health).toBe(100);
+    });
+
+    test('should throw if character is dead', () => {
+        const hero = new Zombie('Ghoul');
+        hero.health = 0;
+
+        expect(() => hero.levelUp()).toThrow();
+    });
+});
